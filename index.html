@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Mood Badder</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #FDF8F0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.quiz-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 32px 20px 44px;
+}
+
+/* Header */
+.quiz-eyebrow {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #C8A951;
+  margin: 0 0 10px;
+}
+
+.quiz-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+  color: #1B3A2F;
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+
+.quiz-sub {
+  text-align: center;
+  font-size: 14px;
+  color: #8A8070;
+  margin: 0 0 28px;
+}
+
+/* Progress */
+.progress-track {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 30px;
+}
+
+.prog-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #DDD5C5;
+  transition: background 0.3s ease, transform 0.3s ease, width 0.3s ease;
+}
+
+.prog-dot.active {
+  background: #1B3A2F;
+  width: 24px;
+  border-radius: 4px;
+}
+
+.prog-dot.done {
+  background: #C8A951;
+}
+
+/* Steps */
+.step {
+  display: none;
+}
+
+.step.visible {
+  display: block;
+  animation: riseIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-q {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1B3A2F;
+  text-align: center;
+  margin: 0 0 22px;
+  line-height: 1.35;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 15px 18px;
+  background: #FFFFFF;
+  border: 1.5px solid #E3D9C9;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.opt-btn:hover {
+  border-color: #1B3A2F;
+  background: #F4EFE5;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 16px rgba(27, 58, 47, 0.09);
+}
+
+.opt-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.opt-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 32px;
+  text-align: center;
+  line-height: 1;
+}
+
+.opt-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1B3A2F;
+  margin-bottom: 2px;
+}
+
+.opt-hint {
+  display: block;
+  font-size: 12px;
+  color: #9A8F80;
+  line-height: 1.4;
+}
+
+/* Result */
+#result-panel {
+  display: none;
+}
+
+#result-panel.visible {
+  display: block;
+  animation: riseIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.result-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E3D9C9;
+  border-radius: 16px;
+  padding: 30px 24px 26px;
+  text-align: center;
+}
+
+.result-pill {
+  display: inline-block;
+  background: #1B3A2F;
+  color: #FDF8F0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+
+.result-tagline {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #C8A951;
+  margin: 0 0 8px;
+}
+
+.result-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1B3A2F;
+  margin: 0 0 12px;
+  line-height: 1.25;
+}
+
+.result-desc {
+  font-size: 14px;
+  color: #5A5040;
+  line-height: 1.65;
+  margin: 0 0 18px;
+}
+
+.result-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1B3A2F;
+  margin: 0 0 20px;
+}
+
+.result-cta {
+  display: inline-block;
+  background: #1B3A2F;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: background 0.18s ease, transform 0.15s ease;
+  letter-spacing: 0.02em;
+}
+
+.result-cta:hover {
+  background: #264D3E;
+  transform: translateY(-2px);
+}
+
+.result-cta:active {
+  transform: translateY(0);
+}
+
+.retry-btn {
+  display: block;
+  margin: 16px auto 0;
+  background: none;
+  border: none;
+  color: #ADA090;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 4px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.18s ease;
+}
+
+.retry-btn:hover {
+  color: #1B3A2F;
+}
+
+/* Separator */
+.result-divider {
+  border: none;
+  border-top: 1px solid #EDE5D8;
+  margin: 20px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="quiz-wrap">
+
+  <p class="quiz-eyebrow">Mood Concentrates</p>
+  <h2 class="quiz-title">Find Your Badder</h2>
+  <p class="quiz-sub">Three questions. One recommendation.</p>
+
+  <div class="progress-track">
+    <div class="prog-dot active" id="pd0"></div>
+    <div class="prog-dot" id="pd1"></div>
+    <div class="prog-dot" id="pd2"></div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="step visible" id="s0">
+    <p class="step-q">How do you usually enjoy cannabis?</p>
+    <div class="options">
+      <button class="opt-btn" onclick="pick(0,'rig')">
+        <span class="opt-icon">🔥</span>
+        <span>
+          <span class="opt-label">Dab rig or e-rig</span>
+          <span class="opt-hint">I've got the setup ready</span>
+        </span>
+      </button>
+      <button class="opt-btn" onclick="pick(0,'joint')">
+        <span class="opt-icon">🌿</span>
+        <span>
+          <span class="opt-label">Joint or bowl</span>
+          <span class="opt-hint">Flower is my base</span>
+        </span>
+      </button>
+      <button class="opt-btn" onclick="pick(0,'new')">
+        <span class="opt-icon">✨</span>
+        <span>
+          <span class="opt-label">Still exploring</span>
+          <span class="opt-hint">Figuring out what works for me</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step" id="s1">
+    <p class="step-q">What are you after?</p>
+    <div class="options">
+      <button class="opt-btn" onclick="pick(1,'happy')">
+        <span class="opt-icon">☀️</span>
+        <span>
+          <span class="opt-label">Uplifted and happy</span>
+          <span class="opt-hint">Good energy, good vibes</span>
+        </span>
+      </button>
+      <button class="opt-btn" onclick="pick(1,'flavor')">
+        <span class="opt-icon">💎</span>
+        <span>
+          <span class="opt-label">Rich flavor, slow session</span>
+          <span class="opt-hint">Terpenes are the whole point</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step" id="s2">
+    <p class="step-q">How much are you in for?</p>
+    <div class="options">
+      <button class="opt-btn" onclick="pick(2,'small')">
+        <span class="opt-icon">🌱</span>
+        <span>
+          <span class="opt-label">$49 for 1g</span>
+          <span class="opt-hint">Start easy, see how it goes</span>
+        </span>
+      </button>
+      <button class="opt-btn" onclick="pick(2,'big')">
+        <span class="opt-icon">🫙</span>
+        <span>
+          <span class="opt-label">$89 for 2g</span>
+          <span class="opt-hint">Commit to the experience</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="result-panel">
+    <div class="result-card">
+      <div class="result-pill">Your pick</div>
+      <p class="result-tagline" id="r-tagline"></p>
+      <h3 class="result-name" id="r-name"></h3>
+      <p class="result-desc" id="r-desc"></p>
+      <hr class="result-divider">
+      <p class="result-price" id="r-price"></p>
+      <a id="r-link" class="result-cta" href="#" target="_blank">Shop Now</a>
+      <button class="retry-btn" onclick="resetQuiz()">Take it again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var ans = [];
+
+var catalog = {
+  'tropical-storm': {
+    tagline: 'Big vibes, bigger jar.',
+    name: 'THCa Tropical Storm Dab Badder',
+    desc: "Mood's most-reviewed badder with 149 reviews at 4.48 stars. A Happy-category pick with a COA linked right on the product page.",
+    price: '$89 for 2g',
+    url: 'https://mood.com/product/thca-tropical-storm-dab-badder?bcc=concentrates'
+  },
+  'london-pound-cake': {
+    tagline: 'Deep flavor, slow session.',
+    name: 'THCa London Pound Cake Dab Badder',
+    desc: 'Named for a strain celebrated for its rich, complex terpene profile. The pick when flavor is the whole session.',
+    price: '$89 for 2g',
+    url: 'https://mood.com/product/thca-london-pound-cake-dab-badder?bcc=concentrates'
+  },
+  'blue-fire': {
+    tagline: 'Sharp flavor, clean session.',
+    name: 'THCa Blue Fire Dab Badder',
+    desc: 'A focused 1g pick with an energetic terpene profile. Works great on a rig, in a pen, or twaxed into a joint.',
+    price: '$49 for 1g',
+    url: 'https://mood.com/product/thca-blue-fire-dab-badder?bcc=concentrates'
+  },
+  'ice-queen': {
+    tagline: 'Cool, complex, terpene-rich.',
+    name: 'THCa Ice Queen Dab Badder',
+    desc: 'A distinct aromatic profile that rewards attentive sessions. At 1g, it\'s the right amount to get acquainted.',
+    price: '$49 for 1g',
+    url: 'https://mood.com/product/thca-ice-queen-dab-badder?bcc=concentrates'
+  }
+};
+
+function resolve() {
+  var vibe  = ans[1];
+  var spend = ans[2];
+  if (vibe === 'happy'  && spend === 'big')   return 'tropical-storm';
+  if (vibe === 'flavor' && spend === 'big')   return 'london-pound-cake';
+  if (vibe === 'happy'  && spend === 'small') return 'blue-fire';
+  if (vibe === 'flavor' && spend === 'small') return 'ice-queen';
+  return 'tropical-storm';
+}
+
+function pick(step, val) {
+  ans[step] = val;
+
+  var dot = document.getElementById('pd' + step);
+  dot.classList.remove('active');
+  dot.classList.add('done');
+
+  if (step < 2) {
+    document.getElementById('s' + step).classList.remove('visible');
+    var next = document.getElementById('s' + (step + 1));
+    next.classList.add('visible');
+    var nd = document.getElementById('pd' + (step + 1));
+    if (nd) nd.classList.add('active');
+  } else {
+    document.getElementById('s2').classList.remove('visible');
+    var key = resolve();
+    var p   = catalog[key];
+    document.getElementById('r-tagline').textContent = p.tagline;
+    document.getElementById('r-name').textContent    = p.name;
+    document.getElementById('r-desc').textContent    = p.desc;
+    document.getElementById('r-price').textContent   = p.price;
+    document.getElementById('r-link').href           = p.url;
+    var panel = document.getElementById('result-panel');
+    panel.style.display = 'block';
+    panel.classList.add('visible');
+  }
+}
+
+function resetQuiz() {
+  ans = [];
+  for (var i = 0; i < 3; i++) {
+    var d = document.getElementById('pd' + i);
+    d.classList.remove('active', 'done');
+    var s = document.getElementById('s' + i);
+    s.classList.remove('visible');
+  }
+  var panel = document.getElementById('result-panel');
+  panel.classList.remove('visible');
+  panel.style.display = 'none';
+  document.getElementById('s0').classList.add('visible');
+  document.getElementById('pd0').classList.add('active');
+}
+</script>
+
+</body>
+</html>
